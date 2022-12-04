@@ -1,0 +1,11 @@
+<mat-sidenav-container>
+    <mat-sidenav #sidenav>
+        <app-side-menu (onCloseSidenav)="onToggleSidenav($event, sidenav)" [actualRole]="(actualUser$|async)?.role" [loggedInUser]="loggedInUser"
+            (onLogout)="logout($event)"></app-side-menu>
+    </mat-sidenav>
+    <mat-sidenav-content style="min-height: 100vh;">
+        <app-main-menu [actualRole]="(actualUser$|async)?.role" [sidenav]="sidenav" [loggedInUser]="loggedInUser" (onLogout)="logout()" (onCloseSidenav)="onToggleSidenav($event, sidenav)">
+        </app-main-menu>
+        <router-outlet></router-outlet>
+    </mat-sidenav-content>
+</mat-sidenav-container>

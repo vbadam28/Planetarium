@@ -1,0 +1,165 @@
+<div
+    style="padding:15px 0;flex-direction:column;display:flex;justify-content: center;align-items: center;width: 100%;height:20%;">
+    <img class="profile-pic" [src]="loadedImage" />
+    <div style="margin-top: 10px;">{{user?.username}}</div>
+</div>
+<div class="container" style="margin-top:10px">
+
+    <mat-card style="max-width: 100%;">
+        <mat-card-header>
+            <mat-card-title>Általános információk</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <mat-list>
+                <mat-list-item>
+                    <mat-icon mat-list-icon>email</mat-icon>
+                    <div mat-line> E-mail </div>
+                    <div mat-line> {{user?.email}} </div>
+                    <mat-icon style="cursor:pointer;" *ngIf="ownProfile" (click)="edit('email')">edit</mat-icon>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon mat-list-icon>account_circle</mat-icon>
+                    <div mat-line> Felhasználónév </div>
+                    <div mat-line> {{user?.username}} </div>
+                    <mat-icon style="cursor:pointer;" *ngIf="ownProfile" (click)="edit('username')">edit</mat-icon>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon mat-list-icon>person</mat-icon>
+                    <div mat-line> Teljes név </div>
+                    <div mat-line> {{user?.lastname }} {{user?.firstname}} </div>
+                    <mat-icon style="cursor:pointer;" *ngIf="ownProfile" (click)="edit('fullname')">edit</mat-icon>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon mat-list-icon>password</mat-icon>
+                    <div mat-line> Jelszó </div>
+                    <div mat-line> ******** </div>
+                    <mat-icon style="cursor:pointer;" *ngIf="ownProfile" (click)="edit('password')">edit</mat-icon>
+                </mat-list-item>
+                <mat-list-item>
+                    <mat-icon mat-list-icon>image</mat-icon>
+                    <div mat-line> Profilkép neve </div>
+                    <div mat-line> {{image?.name}} </div>
+                    <mat-icon style="cursor:pointer;" *ngIf="ownProfile" (click)="fileUpload.click()">upload</mat-icon>
+                    <input style="display:none" #fileUpload (change)="onFileInput($event)" type="file" id="uploadFile"
+                        name="uploadFile" accept="image/*" />
+
+                </mat-list-item>
+                <mat-list-item *ngIf="ownProfile">
+
+                    <mat-icon *ngIf="user?.isPublicResults" mat-list-icon>visibility</mat-icon>
+                    <mat-icon *ngIf="!user?.isPublicResults" mat-list-icon>visibility_off</mat-icon>
+                    <div mat-line> </div>
+                    <mat-checkbox #chbox mat-line (change)="setChanges($event)" [checked]="user?.isPublicResults">
+                        Eredmények ranglistán </mat-checkbox>
+                    <mat-icon style="cursor:pointer;" *ngIf="ownProfile && isPublicResults!=user?.isPublicResults"
+                        (click)="edit('isPublicResults')">save</mat-icon>
+                </mat-list-item>
+            </mat-list>
+
+        </mat-card-content>
+    </mat-card>
+    <ng-container *ngIf="ownProfile">
+        <mat-card style="max-width: 100%;margin-top:10px;">
+            <mat-card-header>
+                <mat-card-title>Statisztika</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-list>
+                    <mat-list-item>
+                        <button matTooltip="Diagram Típusának megváltoztatása" mat-mini-fab color="primary"
+                            (click)="changeChartType()">
+                            <mat-icon *ngIf="chartType=='line'">bar_chart</mat-icon>
+                            <mat-icon *ngIf="chartType=='bar'">show_chart</mat-icon>
+                        </button>
+                        <button *ngFor="let type of gameTypes" mat-raised-button
+                            [color]="this.selectedGameType==type['key']?'accent':'primary'" mat-raised-button
+                            (click)="changeChartData(type['key'])">
+                            {{type['text'] }} </button>
+                    </mat-list-item>
+                </mat-list>
+                <canvas id="chart"></canvas>
+            </mat-card-content>
+        </mat-card>
+        <mat-card style="max-width: 100%;margin-top:10px;">
+            <mat-card-header>
+                <mat-card-title>Eredmények</mat-card-title>
+            </mat-card-header>
+            <mat-card-content>
+                <mat-list>
+                    <mat-list-item>
+                        <button *ngFor="let type of gameTypes" mat-raised-button 
+                            [color]="this.selectedTable==type['key']?'accent':'primary'" mat-raised-button
+                            (click)="changeTableData(type['key'])">
+                            {{type['text'] }} </button>
+                    </mat-list-item>
+                </mat-list>
+
+                
+                <table style="width:100%" mat-table [dataSource]="dataSource" matSort>
+
+                  <ng-container *ngIf="selectedTable=='Examination';else tableElse">
+                  
+                    <ng-container matColumnDef="round1">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> 1.Kör(Azonnali % - Késleltetett %) </th>
+                        <td mat-cell *matCellDef="let res"> {{ (res.shortRoundRatios[0]*100).toFixed(2) }} - {{ (res.longRoundRatios[0]*100).toFixed(2) }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="round2">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> 2.Kör(Azonnali % - Késleltetett %) </th>
+                        <td mat-cell *matCellDef="let res"> {{ (res.shortRoundRatios[1]*100).toFixed(2) }} - {{(res.longRoundRatios[1]*100).toFixed(2) }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="round3">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> 3.Kör(Azonnali % - Késleltetett %) </th>
+                        <td mat-cell *matCellDef="let res"> {{ (res.shortRoundRatios[2]*100).toFixed(2) }} - {{(res.longRoundRatios[2]*100).toFixed(2) }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="round4">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> 4.Kör(Azonnali % - Késleltetett %) </th>
+                        <td mat-cell *matCellDef="let res"> {{ (res.shortRoundRatios[3]*100).toFixed(2) }} - {{(res.longRoundRatios[3]*100).toFixed(2) }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="round5">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> 5.Kör(Azonnali % - Késleltetett %) </th>
+                        <td mat-cell *matCellDef="let res"> {{ (res.shortRoundRatios[4]*100).toFixed(2) }} - {{(res.longRoundRatios[4]*100).toFixed(2) }}</td>
+                    </ng-container>
+                    
+                    <ng-container matColumnDef="round6">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> 6.Kör(Azonnali % - Késleltetett %) </th>
+                        <td mat-cell *matCellDef="let res"> {{ (res.shortRoundRatios[5]*100).toFixed(2) }} - {{(res.longRoundRatios[5]*100).toFixed(2) }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="shortTermAll">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Összesített Azonnali felidézés % </th>
+                        <td mat-cell *matCellDef="let res"> {{res.allShortRoundRatio
+                            ?(res.allShortRoundRatio*100).toFixed(2) : "Nincs elért eredmény"}}
+                        </td>
+                    </ng-container>
+                    <ng-container matColumnDef="longTermAll">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Összesített Késleltetett felidézés % </th>
+                        <td mat-cell *matCellDef="let res"> {{res.allLongRoundRatio
+                            ?(res.allLongRoundRatio*100).toFixed(2) : "Nincs elért eredmény"}}
+                        </td>
+                    </ng-container>
+                </ng-container>
+                <ng-template #tableElse>
+                    <ng-container matColumnDef="level">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Elért szint </th>
+                        <td mat-cell *matCellDef="let res"> {{ res.level }}</td>
+                    </ng-container>
+                    <ng-container matColumnDef="datetime">
+                        <th mat-header-cell *matHeaderCellDef mat-sort-header> Dátum </th>
+                        <td mat-cell *matCellDef="let res"> {{ res.datetime | datetimeFormat }}</td>
+                    </ng-container>
+                </ng-template>
+
+
+                    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                    <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+                    <!-- Row shown when there is no matching data. -->
+                    <tr class="mat-row" *matNoDataRow>
+                        <td class="mat-cell" colspan="4">Nincs megjeleníthető adat </td>
+                    </tr>
+                </table>
+
+                <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of users"></mat-paginator>
+            </mat-card-content>
+        </mat-card>
+    </ng-container>
+</div>

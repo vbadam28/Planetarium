@@ -1,0 +1,44 @@
+#board {
+    display: grid;
+    position: relative;
+}
+
+
+.point {
+    cursor: pointer;
+}
+
+.point:hover,
+.hover-closest {
+    r: 7;
+    fill: #f8f8f9;
+    filter: url(#glow);
+    cursor: pointer;
+}
+
+.hover-closest-line {
+    filter: url(#a);
+    cursor: pointer;
+}
+
+@media (max-width:480px) {
+    .mat-dialog-container-small {
+        width: 100% !important;
+    }
+
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding-top: 20px;
+    flex-direction: column;
+}
+.control-button{
+    margin-top: 20px;
+    width: 200px;
+    height: 60px;
+    font-size: large;
+}

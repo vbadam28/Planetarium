@@ -1,0 +1,86 @@
+<div class="container">
+    <h1>{{playedTutorial?game.text:'Bemutató pálya' }} </h1>
+  <div  *ngIf="(gameTimer$|async) as time" style="width:100;text-align: center;">
+      <h1 *ngIf="time[0]>0" >
+        {{ time[0] | countdown: 'min' }}
+      </h1>
+    
+  </div>
+
+  <svg [gameControl]="clickedElement" [drawingBoard]="tmp" [points]="playedTutorial?starPoints:tutorialBoard" [gameAreaPadding]="gameAreaPadding"
+    [gameTimer$]="gameTimer$" (userLines)="setUserLines($event)"
+    [helpLine$]="helpLine$" [lines]="(linesForControl$|async)!"
+    id="svg-board" style="background-color:#0c1445;"
+    [attr.width]="gameAreaSize.width+gameAreaPadding" [attr.height]="gameAreaSize.height+gameAreaPadding"
+    >
+
+    <g id="board-stars">
+
+      <defs>
+        <radialGradient id="g">
+          <stop stop-color="#00f" offset="0.1" />
+          <stop stop-color="rgba(0,0,255, 0.5)" offset="0.8" />
+        </radialGradient>
+        <filter id="glow" width="300%" height="300%" x="-100%" y="-100%">
+          <!-- Use a gaussian blur to create the soft blurriness of the glow -->
+          <feGaussianBlur in="thicken" stdDeviation="5" result="blurred" />
+          <!-- nem kell merge ha scak egy blurred object kell -->
+          <feMerge>
+            <feMergeNode in="blurred" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+        <filter id="glow-smaller" width="300%" height="300%" x="-100%" y="-100%">
+          <!-- Use a gaussian blur to create the soft blurriness of the glow -->
+          <feGaussianBlur in="thicken" stdDeviation="2" result="blurred" />
+          <!-- nem kell merge ha scak egy blurred object kell -->
+          <feMerge>
+            <feMergeNode in="blurred" />
+            <feMergeNode in="SourceGraphic" />
+          </feMerge>
+        </filter>
+
+      </defs>
+
+      <circle class="point" *ngFor="let starPoint of stars$|async; let i=index"
+        [ngStyle]="{display: (!solutionVisible && starVisible) || (solutionVisible && starPoint.active)?'':'none'}" [id]="'point-'+i" [attr.cx]="(starPoint.column+gameAreaPadding/2)"
+        [attr.cy]="starPoint.row+gameAreaPadding/2"
+        [attr.r]="(((starPoint.active && solutionVisible) || (starPoint.isVisible && !solutionVisible))?starPoint.r+2:starPoint.r)"
+        stroke-width="2"
+        [attr.fill]="(((starPoint.active && solutionVisible) || (starPoint.isVisible && !solutionVisible))?'#f8f8f9':'#e5e5eb')"
+        [attr.filter]="(((starPoint.active && solutionVisible) || (starPoint.isVisible && !solutionVisible))?'url(#glow)':'')" />
+      <!--{{i+" row:"+starPoint.row+"\n column:"+starPoint.column}}-->
+    </g>
+    <defs>
+
+      <filter id="a" filterUnits="userSpaceOnUse">
+        <!-- Use a gaussian blur to create the soft blurriness of the glow -->
+        <feGaussianBlur in="thicken" stdDeviation="10" result="blurred" />
+        <feMerge>
+          <feMergeNode in="blurred" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+
+    </defs>
+
+    <g [@lineAnimation]="solutionVisible ? lineSize  : 0" id="board-lines" *ngIf="solutionVisible"
+      style="position: absolute;top:0;left:0;">
+      <line *ngFor="let starLine of (lines$ |async); let i=index" [id]="'line-'+i" stroke="#f8f8f9"
+        [attr.x1]="(starLine.startPoint.column+gameAreaPadding/2)" [attr.y1]="starLine.startPoint.row+gameAreaPadding/2"
+        [attr.x2]="(starLine.endPoint!.column+gameAreaPadding/2)" [attr.y2]="starLine.endPoint!.row+gameAreaPadding/2"
+        stroke-width="2" />
+    </g>
+    <g id="board-draw-lines" #tmp>
+
+    </g>
+  </svg>
+
+
+    <!--button (click)="solutionVisible=!solutionVisible">change</button-->
+    <button mat-button color="primary" class="control-button" mat-raised-button (click)="startGame()" *ngIf="gameState=='init'">{{playedTutorial?'Játék kezdése':'Bemutató kezdése'}}</button>
+    <button mat-button color="primary" class="control-button" mat-raised-button *ngIf="roundCounter<=this.game['gameArea'].rounds && gameState=='started'" [disabled]="isNextRunning"
+      (click)="nextRound()">{{'Következő'}}</button>
+      
+    <!--button *ngIf="phase==1"(click)="help()" [disabled]="!helpAvailable">Help</button-->
+</div>

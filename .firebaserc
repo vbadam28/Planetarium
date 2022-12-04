@@ -1,0 +1,14 @@
+{
+  "targets": {
+    "planetarium-48d51": {
+      "hosting": {
+        "planetarium": [
+          "planetarium-48d51"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "default": "planetarium-48d51"
+  }
+}

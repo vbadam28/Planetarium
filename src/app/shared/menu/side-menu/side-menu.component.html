@@ -1,0 +1,38 @@
+<mat-nav-list>
+    <a mat-list-item routerLink="/login" (click)="close()" *ngIf="!loggedInUser">
+        <mat-icon>login</mat-icon>
+        <span>Bejelentkezés</span>
+    </a>
+    <a mat-list-item routerLink="/login" (click)="close(true)" *ngIf="loggedInUser">
+        <mat-icon>logout</mat-icon>
+        <span>Kijelentkezés</span>
+    </a>
+    <a mat-list-item routerLink="/signup" (click)="close()" *ngIf="!(loggedInUser)">
+        <mat-icon>app_registration</mat-icon>
+        <span>Regisztráció</span>
+    </a>
+    <a mat-list-item routerLink="/main" (click)="close()">
+        <mat-icon>grid_view</mat-icon>
+        <span>Főoldal</span>
+    </a>
+    <a mat-list-item routerLink="/leaderboard"  *ngIf="loggedInUser" (click)="close()">
+        <mat-icon>leaderboard</mat-icon>
+        <span>Ranglista</span>
+    </a>
+    <a mat-list-item routerLink="/game" (click)="close()">
+        <mat-icon>games</mat-icon>
+        <span>Játék</span>
+    </a>
+    <a mat-list-item routerLink="/permission" (click)="close()"  *ngIf="loggedInUser && actualRole==roles.ADMIN">
+        <mat-icon>settings</mat-icon>
+        <span>Jogosultságok</span>
+    </a>
+    <a mat-list-item routerLink="/patients" (click)="close()"  *ngIf="loggedInUser && actualRole==roles.DOCTOR">
+        <mat-icon>settings</mat-icon>
+        <span>Pácienseim</span>
+    </a>
+    <a mat-list-item routerLink="/profile" (click)="close()" *ngIf="loggedInUser">
+        <mat-icon>account_circle</mat-icon>
+        <span>Profil</span>
+    </a>
+</mat-nav-list>

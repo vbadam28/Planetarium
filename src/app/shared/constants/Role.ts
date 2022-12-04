@@ -1,0 +1,1 @@
+export enum Roles{PATIENT,DOCTOR,ADMIN}

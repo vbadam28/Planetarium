@@ -1,0 +1,7 @@
+<div class="outer-container">
+<div class="container">
+    <mat-card class="game-menu-item" matRipple [matRippleColor]="'#ff4081'" *ngFor="let item of gameModes; let i=index" [routerLink]="['/game',item['key']]">
+        {{item['text'] }}
+    </mat-card>
+</div>
+</div>

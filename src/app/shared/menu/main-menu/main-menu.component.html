@@ -1,0 +1,38 @@
+<mat-toolbar color="primary">
+    <div  *ngIf="isVisible">
+      <button mat-icon-button (click)="back()" >
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+    </div>  
+    <div fxHide.gt-xs>
+        <button mat-icon-button (click)="onToggleSidenav()">
+          <mat-icon>menu</mat-icon>
+        </button>
+      </div>
+      <div>PLANETARIUM</div>
+      <div fxFlex fxLayout fxLayoutAlign="flex-end" fxHide.xs>
+        <ul fxLayout fxLayoutGap="10px" class="navigation-items">
+      
+          <li *ngIf="!(loggedInUser)" [ngClass]="{'active': activeMenu=='login'}" ><a routerLink="/login">Bejelentkezés</a></li>
+          <li *ngIf="loggedInUser"><a routerLink="/login" (click)="logout()">Kijelentkezés</a></li>
+          <li *ngIf="!(loggedInUser)" [ngClass]="{'active': activeMenu=='signup'}"><a routerLink="/signup">Regisztráció</a></li>
+          <li [ngClass]="{'active': activeMenu=='main'}"><a routerLink="/main">Főoldal</a></li>
+          <li *ngIf="loggedInUser" [ngClass]="{'active': activeMenu=='leaderboard'}"><a routerLink="/leaderboard">Ranglista</a></li>
+          <li>
+            <a style="padding-bottom:10px;" [ngClass]="{'active': activeMenu=='game'}" routerLink="/game">Játék</a>
+            <button mat-icon-button style="width:auto;height:auto;" [matMenuTriggerFor]="menu" aria-label="Example icon-button with a menu">
+              <mat-icon>expand_more</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button style="text-align: center;" *ngFor="let item of gameModesMenu" mat-menu-item [routerLink]="['/game',item['key']]">
+                <span>{{item['text']}}</span>
+              </button>
+            </mat-menu>
+          </li>
+          <li *ngIf="loggedInUser && actualRole===role.ADMIN" [ngClass]="{'active': activeMenu=='permission'}"><a routerLink="/permission">Jogosultságok</a></li>
+          <li *ngIf="loggedInUser && actualRole===role.DOCTOR" [ngClass]="{'active': activeMenu=='patients'}"><a routerLink="/patients/list-patient">Pácienseim</a></li>
+          <li *ngIf="loggedInUser" [ngClass]="{'active': activeMenu=='profile'}"><a routerLink="/profile">Profil</a></li>
+        
+      </ul>
+      </div>
+    </mat-toolbar>

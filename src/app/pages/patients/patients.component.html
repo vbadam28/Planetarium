@@ -1,0 +1,21 @@
+<mat-toolbar color="accent">
+    <mat-toolbar-row>
+
+        <div fxFlex fxLayout fxLayoutAlign="flex-end">
+            <ul fxLayout fxLayoutGap="20px" class="navigation-items">
+
+                <li><a routerLink="/patients/list-patient">Páciensek Listázása</a></li>
+                <li><a routerLink="/patients/add-patient">Páciens felvétele</a></li>
+
+            </ul>
+        </div>
+    </mat-toolbar-row>
+</mat-toolbar>
+<div class="splash-category">
+    <mat-card matRipple routerLink="/patients/list-patient">
+        Betegek Listázása
+    </mat-card>
+    <mat-card matRipple routerLink="/patients/add-patient">
+        Betegek Felvétele
+    </mat-card>
+</div>

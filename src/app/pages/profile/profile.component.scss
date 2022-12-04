@@ -1,0 +1,32 @@
+div.container {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    margin-left: auto;
+    margin-right: auto;
+    //  min-width: 500px !important;
+    width: 60%;
+}
+.profile-pic{
+    width:200px;
+    height: 200px;
+}
+
+.action-btn {
+    position: fixed;
+    bottom: 16px;
+    right: 16px;
+}
+@media (max-width:720px) {
+    
+    div.container{
+        width: 100%;
+    }
+}
+
+@media (max-width:480px) {
+    div.container{
+        width: 100%;
+    }
+}
+button{margin:5px;}

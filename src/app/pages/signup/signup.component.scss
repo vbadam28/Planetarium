@@ -1,0 +1,63 @@
+.div-flex {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+.main_component {
+    height: calc(100vh - 65px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+}
+mat-form-field{
+    margin:10px 0;
+}
+mat-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 40%;
+    padding: 30px 0;
+}
+
+mat-card-header {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    margin: 10px 0;
+}
+
+mat-card-content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+    width: 100%;
+    ;
+}
+
+form div {
+    padding: 5px 5px 5px 5px;
+}
+
+form {
+    display: inline-grid;
+    width: 85%;
+    align-self: center;
+}
+
+.subForm {
+    width: 100%;
+    display: inline-grid;
+}
+
+.buttons {
+    padding: 5px;
+}
+
+button {
+    width: 120px;
+}

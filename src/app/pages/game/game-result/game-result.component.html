@@ -1,0 +1,215 @@
+<h3 style="text-align: center;font-size: x-large;">{{title}}</h3>
+
+<ng-container *ngIf="gameResult$|async as currentResult;">
+
+  <ng-container *ngIf="currentResult.gameType=='Examination'; else stat">
+    <div class="container">
+      <div class="canvas-container">
+        <canvas id="chart"></canvas>
+      </div>
+    </div>
+
+
+    <div class="container">
+
+      <mat-form-field appearance="fill">
+        <mat-label>Válassz fordulót</mat-label>
+        <mat-select [(value)]="selected" (valueChange)="roundSelected($event)">
+          <mat-option *ngFor="let round of rounds" [value]="round">{{round+1}}. Kör</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+  </ng-container>
+  <ng-template #stat>
+    <span> Rontott vonalak: {{ currentResult.shortTermWrongLines!.length>0 && (currentResult.shortTermWrongLines![0] |
+      json) !=
+      '{}' ? currentResult.shortTermWrongLines![0].value.length:0 }}
+    </span>
+    <br>
+    <span> Kihagyott vonalak: {{ currentResult.shortTermMissingLines!.length>0 &&
+      (currentResult.shortTermMissingLines![0] |
+      json) != '{}' ? currentResult.shortTermMissingLines![0].value.length:0 }}
+    </span>
+  </ng-template>
+  <div style="width:100%;display: flex;justify-content: center;align-items: center;padding-top:20px;flex-wrap: wrap;">
+    <div class="board-container">
+      <div class="title">
+        Eredeti pálya
+      </div>
+      <div class="content">
+        <div class="statistic">
+        </div>
+        <svg id="svg-board" style="background-color:#0c1445;" [attr.width]="gameAreaSize.width+gameAreaPadding"
+          [attr.height]="(gameAreaSize.height)+gameAreaPadding">
+          <g id="board-stars">
+
+            <defs>
+              <radialGradient id="g">
+                <stop stop-color="#00f" offset="0.1" />
+                <stop stop-color="rgba(0,0,255, 0.5)" offset="0.8" />
+              </radialGradient>
+              <filter id="glow" width="300%" height="300%" x="-100%" y="-100%">
+                <!-- Use a gaussian blur to create the soft blurriness of the glow -->
+                <feGaussianBlur in="thicken" stdDeviation="5" result="blurred" />
+                <!-- nem kell merge ha scak egy blurred object kell -->
+                <feMerge>
+                  <feMergeNode in="blurred" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+              <filter id="glow-smaller" width="300%" height="300%" x="-100%" y="-100%">
+                <!-- Use a gaussian blur to create the soft blurriness of the glow -->
+                <feGaussianBlur in="thicken" stdDeviation="2" result="blurred" />
+                <!-- nem kell merge ha scak egy blurred object kell -->
+                <feMerge>
+                  <feMergeNode in="blurred" />
+                  <feMergeNode in="SourceGraphic" />
+                </feMerge>
+              </filter>
+
+            </defs>
+
+            <circle class="point" *ngFor="let starPoint of currentResult.boardPoints; let i=index" [id]="'point-'+i"
+              [attr.cx]="((starPoint.column*gameAreaCorrection.width) + (gameAreaPadding/2))"
+              [attr.cy]="((starPoint.row*gameAreaCorrection.height)+(gameAreaPadding/2))"
+              [attr.r]="((starPoint.active)?starPoint.r+2:starPoint.r)" stroke-width="2" [attr.fill]="'#f8f8f9'"
+              [attr.filter]="'url(#glow)'" />
+            <!--{{i+" row:"+starPoint.row+"\n column:"+starPoint.column}}-->
+          </g>
+          <defs>
+
+            <filter id="a" filterUnits="userSpaceOnUse">
+              <!-- Use a gaussian blur to create the soft blurriness of the glow -->
+              <feGaussianBlur in="thicken" stdDeviation="10" result="blurred" />
+              <feMerge>
+                <feMergeNode in="blurred" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+
+          </defs>
+          <g id="board-lines" style="position: absolute;top:0;left:0;">
+            <line
+              *ngFor="let starLine of currentResult.validLines![currentResult.gameType=='Examination'?selected:currentGameResult.level!-1].value; let i=index"
+              [id]="'line-'+i" stroke="#f8f8f9"
+              [attr.x1]="(starLine.startPoint.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y1]="starLine.startPoint.row*gameAreaCorrection.height+gameAreaPadding/2"
+              [attr.x2]="(starLine.endPoint!.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y2]="starLine.endPoint!.row*gameAreaCorrection.height+gameAreaPadding/2" stroke-width="2" />
+          </g>
+
+        </svg>
+      </div>
+
+    </div>
+    <div class="board-container">
+      <div class="title">
+        <ng-container *ngIf="currentGameResult && currentGameResult.gameType=='Examination'; else elseTemplate">
+
+          Rövidtávú memória
+        </ng-container>
+        <ng-template #elseTemplate>
+          Utolsó pálya
+        </ng-template>
+
+      </div>
+      <div class="content">
+        <div class="statistic">
+
+        </div>
+        <svg id="svg-board" style="background-color:#0c1445;" [attr.width]="gameAreaSize.width+gameAreaPadding"
+          [attr.height]="gameAreaSize.height+gameAreaPadding">
+          <g id="board-stars">
+
+            <circle class="point" *ngFor="let starPoint of currentResult.boardPoints let i=index" [id]="'point-'+i"
+              [attr.cx]="(starPoint.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.cy]="starPoint.row*gameAreaCorrection.height+gameAreaPadding/2"
+              [attr.r]="((starPoint.active)?starPoint.r+2:starPoint.r)" stroke-width="2" [attr.fill]="'#f8f8f9'"
+              [attr.filter]="'url(#glow)'" />
+            <!--{{i+" row:"+starPoint.row+"\n column:"+starPoint.column}}-->
+          </g>
+
+          <g id="board-lines" style="position: absolute;top:0;left:0;">
+            <line
+              *ngFor="let starLine of currentResult.shortTermLines![currentResult.gameType=='Examination'?selected:currentGameResult.level!-1].value; let i=index"
+              [id]="'line-'+i" [attr.stroke]="starLine.color ?? '#f8f8f9'"
+              [attr.x1]="(starLine.startPoint.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y1]="starLine.startPoint.row*gameAreaCorrection.height+gameAreaPadding/2"
+              [attr.x2]="(starLine.endPoint!.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y2]="starLine.endPoint!.row*gameAreaCorrection.height+gameAreaPadding/2" stroke-width="2" />
+          </g>
+
+
+          <g id="board-short-lines-wrong" style="position: absolute;top:0;left:0;">
+            <line *ngFor="let starLine of currentResult.shortTermWrongLines![selected].value || []; let i=index"
+              [id]="'line-'+i" [attr.stroke]="'red'"
+              [attr.x1]="(starLine.startPoint.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y1]="starLine.startPoint.row*gameAreaCorrection.height+gameAreaPadding/2"
+              [attr.x2]="(starLine.endPoint!.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y2]="starLine.endPoint!.row*gameAreaCorrection.height+gameAreaPadding/2" stroke-width="2" />
+          </g>
+          <g id="board-short-lines-missing" style="position: absolute;top:0;left:0;">
+            <line *ngFor="let starLine of currentResult.shortTermMissingLines![selected].value; let i=index"
+              [id]="'line-'+i" [attr.stroke]="'yellow'"
+              [attr.x1]="(starLine.startPoint.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y1]="starLine.startPoint.row*gameAreaCorrection.height+gameAreaPadding/2"
+              [attr.x2]="(starLine.endPoint!.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y2]="starLine.endPoint!.row*gameAreaCorrection.height+gameAreaPadding/2" stroke-width="2" />
+          </g>
+        </svg>
+      </div>
+    </div>
+    <div class="board-container" *ngIf="currentResult.longRoundRatios">
+      <div class="title">
+        Hosszútávú memória
+      </div>
+      <div class="content">
+        <div class="statistic">
+          <!--    {{(currentGameResult.longRoundRatios![selected]*100).toFixed(2) }}%
+-->
+        </div>
+
+        <svg id="svg-board" style="background-color:#0c1445;margin:1px;"
+          [attr.width]="gameAreaSize.width+gameAreaPadding" [attr.height]="gameAreaSize.height+gameAreaPadding">
+          <g id="board-stars">
+            <circle class="point" *ngFor="let starPoint of currentResult.boardPoints; let i=index" [id]="'point-'+i"
+              [attr.cx]="(starPoint.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.cy]="starPoint.row*gameAreaCorrection.height+gameAreaPadding/2"
+              [attr.r]="((starPoint.active)?starPoint.r+2:starPoint.r)" stroke-width="2" [attr.fill]="'#f8f8f9'"
+              [attr.filter]="'url(#glow)'" />
+            <!--{{i+" row:"+starPoint.row+"\n column:"+starPoint.column}}-->
+          </g>
+
+          <g id="board-lines" style="position: absolute;top:0;left:0;" *ngIf="currentResult.longTermLines">
+            <line *ngFor="let starLine of currentResult.longTermLines[selected].value; let i=index" [id]="'line-'+i"
+              stroke="#f8f8f9" [attr.x1]="(starLine.startPoint.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y1]="starLine.startPoint.row*gameAreaCorrection.height+gameAreaPadding/2"
+              [attr.x2]="(starLine.endPoint!.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y2]="starLine.endPoint!.row*gameAreaCorrection.height+gameAreaPadding/2" stroke-width="2" />
+          </g>
+
+          <g id="board-long-lines-wrong" style="position: absolute;top:0;left:0;"
+            *ngIf="currentResult.longTermWrongLines">
+            <line *ngFor="let starLine of currentResult.longTermWrongLines[selected].value; let i=index"
+              [id]="'line-'+i" [attr.stroke]="'red'"
+              [attr.x1]="(starLine.startPoint.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y1]="starLine.startPoint.row*gameAreaCorrection.height+gameAreaPadding/2"
+              [attr.x2]="(starLine.endPoint!.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y2]="starLine.endPoint!.row*gameAreaCorrection.height+gameAreaPadding/2" stroke-width="2" />
+          </g>
+          <g id="board-long-lines-missing" style="position: absolute;top:0;left:0;"
+            *ngIf="currentResult.longTermMissingLines">
+
+            <line *ngFor="let starLine of currentResult.longTermMissingLines[selected].value; let i=index"
+              [id]="'line-'+i" [attr.stroke]="'yellow'"
+              [attr.x1]="(starLine.startPoint.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y1]="starLine.startPoint.row*gameAreaCorrection.height+gameAreaPadding/2"
+              [attr.x2]="(starLine.endPoint!.column*gameAreaCorrection.width+gameAreaPadding/2)"
+              [attr.y2]="starLine.endPoint!.row*gameAreaCorrection.height+gameAreaPadding/2" stroke-width="2" />
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+
+</ng-container>

@@ -1,0 +1,77 @@
+<form [formGroup]="form" >
+    <div *ngIf="type==='username'">
+        <h3>Felhasználónév módosítása</h3>
+
+        <mat-form-field class="max-width" style="min-width: 40%;">
+            <mat-label>Új Felhasználónév</mat-label>
+            <input matInput placeholder="Új felhasználónév" focus formControlName="username">
+        </mat-form-field>
+
+    </div>
+    <div *ngIf="type==='fullname'">
+        <h3>Teljes név módosítása</h3>
+
+        <mat-form-field class="max-width" style="min-width: 40%;">
+            <mat-label>Vezetéknév</mat-label>
+            <input matInput placeholder="Vezetéknév" focus formControlName="firstname">
+        </mat-form-field>
+        <mat-form-field class="max-width" style="min-width: 40%;">
+            <mat-label>Keresztnév</mat-label>
+            <input matInput placeholder="Keresztnév" focus formControlName="lastname">
+        </mat-form-field>
+
+    </div>
+    <div *ngIf="type==='email'">
+        <h3>Email módosítása</h3>
+
+        <mat-form-field class="max-width" style="min-width: 40%;">
+            <mat-label>Új Email</mat-label>
+            <input matInput placeholder="új email" focus formControlName="email">
+            <mat-hint align="end">kell bele @</mat-hint>
+                    <mat-error *ngIf="this.form.get('email')?.errors?.['required']">
+                        Kötelező megadni az email-t
+                    </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="max-width" style="min-width: 40%;">
+            <mat-label>Megerősítő jelszó</mat-label>
+            <input matInput  type="password" placeholder="Megerősítő jelszó" focus formControlName="oldPasswordConfirm">
+        </mat-form-field>
+
+    </div>
+
+    <div *ngIf="type==='password'">
+        <h3>Jelszó módosítása</h3>
+
+        <mat-form-field class="max-width" style="min-width: 40%;">
+            <mat-label>Új Jelszó</mat-label>
+            <input matInput  type="password" placeholder="új jelszó" focus formControlName="newPassword">
+            <mat-hint [ngStyle]="{ 'color':(this.form.get('newPassword')?.errors?.['minlength'] ? 'red':'')}" align="end">min. hossz 6 / {{form.value.newPassword.length}}</mat-hint>
+            <mat-error *ngIf="this.form.get('newPassword')?.errors?.['required']">
+                Kötelező megadni a jelszót
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="max-width" style="min-width: 40%;">
+            <mat-label>Új jelszó megerősítése</mat-label>
+            <input matInput  type="password" placeholder="Új jelszó megerősítése" focus formControlName="newPasswordConfirm">
+            <mat-hint [ngStyle]="{ 'color':( this.form.get('newPasswordConfirm')?.errors?.['minlength'] ? 'red':'')}" align="end">min. hossz 6 / {{form.value.newPasswordConfirm.length}}</mat-hint>
+            <mat-error *ngIf="this.form.get('newPasswordConfirm')?.errors?.['required']">
+                Kötelező megadni a jelszót
+            </mat-error>
+        </mat-form-field>
+
+        <mat-form-field class="max-width" style="min-width: 40%;">
+            <mat-label>Megerősítő jelszó</mat-label>
+            <input matInput  type="password" placeholder="Megerősítő jelszó" focus formControlName="oldPasswordConfirm">
+        </mat-form-field>
+
+    </div>
+
+
+    <div style="display: flex; justify-content: flex-end;">
+        <button mat-button (click)="dialogRef.close();" class="margin-right">MÉGSEM</button>
+        <button mat-button   (click)="check()" [disabled]="form.invalid">MENTÉS</button>
+    </div>
+<!-- [mat-dialog-close]="form.value" -->
+</form>
